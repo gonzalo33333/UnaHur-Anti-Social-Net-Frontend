@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ahora sí podés poner tus estilos personalizados */
+:root {
+  --color-principal: #1e40af;
+}
