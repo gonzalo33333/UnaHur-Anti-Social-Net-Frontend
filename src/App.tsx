@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import PostForm from "./pages/PostForm";
 import { Routes, Route } from "react-router-dom"; // <-- asegurate de tener esto
+import PostDetail from "./pages/PostDetail";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <main className="max-w-5xl mx-auto p-4">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/post/:id" element={<PostDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
