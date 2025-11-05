@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api/apiClient";
 import { useAuth } from "../context/AuthContext";
 import type { Post, Tag } from "../types";
+import { confirmAlert, successAlert, errorAlert } from "../utils/alerts";
+
 
 type PostWithExtras = Post & {
   images?: string[];
@@ -27,16 +29,23 @@ export default function PostCard({
   const navigate = useNavigate();
 
   const handleDelete = async () => {
-    if (!confirm("¿Seguro que querés eliminar esta publicación?")) return;
-    try {
-      await api.delete(`/posts/${post.id}`);
-      alert("Publicación eliminada");
-      onDelete?.(post.id);
-    } catch (err) {
-      console.error(err);
-      alert("Error al eliminar la publicación");
-    }
-  };
+  // Confirmación con SweetAlert
+  const confirmed = await confirmAlert(
+    "Eliminar publicación",
+    "¿Seguro que querés eliminar esta publicación?"
+  );
+  if (!confirmed) return;
+
+  try {
+    await api.delete(`/posts/${post.id}`);
+    await successAlert("Éxito", "Publicación eliminada");
+    onDelete?.(post.id);
+  } catch (err) {
+    console.error(err);
+    await errorAlert("Error", "No se pudo eliminar la publicación");
+  }
+};
+
 
   return (
     <article className="relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 w-full">

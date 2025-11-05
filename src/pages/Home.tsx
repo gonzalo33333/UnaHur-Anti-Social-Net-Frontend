@@ -95,13 +95,13 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="pt-12 min-h-screen bg-gray-100">
-      <header className="py-8 text-center bg-white shadow-sm mb-6">
+    <div className="pt-12 min-h-screen ">
+      <header className="py-8 text-center bg-white shadow-sm mb-6 rounded-lg">
         <h1 className="text-4xl font-bold text-blue-700">
-          Bienvenido a <span className="text-blue-800">UnaHur</span>
+          Bienvenido a <span className="text-blue-800">UnaHur Anti-Social Net</span>
         </h1>
         <p className="text-gray-600 mt-2">
-          La red social del TP — explorá publicaciones, comentá y compartí tus ideas.
+          Explorá publicaciones, comentá y compartí tus ideas.
         </p>
       </header>
 

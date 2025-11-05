@@ -101,8 +101,8 @@ export default function Profile() {
   if (!user) return <p className="p-4">Iniciá sesión para ver tu perfil.</p>;
 
   return (
-    <div className="pt-12 min-h-screen bg-gray-100">
-      <header className="py-8 text-center bg-white shadow-sm mb-6">
+    <div className="pt-12 min-h-screen">
+      <header className="py-8 text-center bg-white shadow-sm mb-6 rounded-lg">
         <h1 className="text-4xl font-bold text-blue-700">
           Perfil de <span className="text-blue-800">{user?.nickName}</span>
         </h1>

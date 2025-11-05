@@ -27,7 +27,6 @@ export default function Login() {
         (u) => u.nickName.trim().toLowerCase() === nickName.trim().toLowerCase()
       );
 
-      // 🧩 Primero: verificar si el usuario existe
       if (!user) {
         await infoAlert(
           "Usuario no encontrado",
@@ -36,13 +35,11 @@ export default function Login() {
         return;
       }
 
-      // 🔐 Segundo: verificar contraseña
       if (password !== "123456") {
         await errorAlert("Contraseña incorrecta", "La contraseña fija es 123456.");
         return;
       }
 
-      // ✅ Si todo está bien, iniciar sesión
       login(user);
       navigate("/");
 
@@ -53,8 +50,13 @@ export default function Login() {
   };
 
   return (
-    <div className="pt-12 flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="pt-12 flex justify-center items-center min-h-screen">
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+        {/* 🔹 Título agregado */}
+        <h1 className="text-3xl font-extrabold text-center text-blue-800 mb-2">
+          UnaHur Anti-Social Net
+        </h1>
+
         <h2 className="text-2xl font-bold text-center mb-6 text-blue-700">
           Iniciar sesión
         </h2>

@@ -6,7 +6,6 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    // 🔹 Cierra sesión directamente sin pedir confirmación
     await logout();
     navigate("/login");
   };
@@ -15,20 +14,27 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 w-full bg-white shadow-md p-4 flex items-center justify-between z-50">
       {/* 🔵 Sección izquierda */}
       <div className="flex items-center gap-4">
-        <Link to="/" className="font-bold text-xl text-blue-700">
+        <Link
+          to={user ? "/home" : "/login"}
+          className="font-bold text-xl text-blue-700"
+        >
           UnaHur
         </Link>
 
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            isActive
-              ? "text-blue-600 font-semibold"
-              : "text-gray-600 hover:text-blue-500"
-          }
-        >
-          Inicio
-        </NavLink>
+        {user && (
+          <NavLink
+            to="/home"
+            className={({ isActive }) =>
+              `ml-2 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                isActive
+                  ? "!bg-blue-700 text-white"
+                  : "!bg-blue-500 hover:bg-blue-600 text-white"
+              }`
+            }
+          >
+            Inicio
+          </NavLink>
+        )}
 
         {user && (
           <NavLink

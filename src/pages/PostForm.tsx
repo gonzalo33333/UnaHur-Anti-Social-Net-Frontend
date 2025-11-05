@@ -3,6 +3,7 @@ import { api } from "../api/apiClient";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import type { PostImage, Tag } from "../types";
+import { errorAlert } from "../utils/alerts";
 
 interface PostFormProps {
   mode: "create" | "edit" | "view";
@@ -21,6 +22,8 @@ export default function PostForm({ mode }: PostFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(mode !== "create");
   const [saving, setSaving] = useState(false);
+
+  const [duplicateTagError, setDuplicateTagError] = useState("");
 
   // 🟦 Si está en modo edición o vista, carga datos del post existente
   useEffect(() => {
@@ -63,62 +66,79 @@ export default function PostForm({ mode }: PostFormProps) {
   };
 
   const handleAddCustomTag = async () => {
-    const name = customTag.trim();
-    if (!name) return;
-    try {
-      const res = await api.post<Tag>("/tags", { name });
-      setTags((prev) => [...prev, res.data]);
-      setCustomTag("");
-    } catch {
-      alert("No se pudo agregar la etiqueta");
-    }
-  };
+  const name = customTag.trim();
+  if (!name) return;
+
+  // 🔹 Validación de duplicado
+  if (tags.some((t) => t.name.toLowerCase() === name.toLowerCase())) {
+    setDuplicateTagError("Esta etiqueta ya fue agregada a la publicación.");
+    return;
+  }
+
+  try {
+    const res = await api.post<Tag>("/tags", { name });
+    setTags((prev) => [...prev, res.data]);
+    setCustomTag("");
+    setDuplicateTagError(""); // limpiar error si se agrega correctamente
+  } catch {
+    alert("No se pudo agregar la etiqueta");
+  }
+};
 
   const handleRemoveTag = (tagId: number) => {
     setTags((prev) => prev.filter((t) => t.id !== tagId));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (saving || mode === "view") return;
-    if (!user) return alert("Debes estar logueado.");
+  e.preventDefault();
 
-    try {
-      setSaving(true);
-      let postId = id;
+  if (saving || mode === "view") return;
+  if (!user) return alert("Debes estar logueado.");
 
-      if (mode === "create") {
-        const res = await api.post("/posts", {
-          description,
-          userId: user.id,
-        });
-        postId = res.data.id;
-      } else {
-        await api.put(`/posts/${id}`, { description });
-      }
+  // 🔹 VALIDACIÓN: descripción obligatoria
+  if (!description.trim()) {
+  errorAlert("Error", "La descripción no puede estar vacía"); // ⚠️ Usando SweetAlert
+  return; // 🚫 Detener ejecución
+}
 
-      const validNew = newImages.map((u) => u.trim()).filter(Boolean);
-      for (const url of validNew) {
-        await api.post("/images", { url, postId: Number(postId) });
-      }
+  try {
+    setSaving(true);
+    let postId = id;
 
-      for (const tag of tags) {
-        await api.post(`/posts/${postId}/addTag/${tag.id}`).catch(() => {});
-      }
-
-      navigate(mode === "create" ? "/" : `/post/${postId}`);
-    } catch {
-      setError("Error al guardar la publicación");
-    } finally {
-      setSaving(false);
+    if (mode === "create") {
+      const res = await api.post("/posts", {
+        description,
+        userId: user.id,
+      });
+      postId = res.data.id;
+    } else {
+      await api.put(`/posts/${id}`, { description });
     }
-  };
+
+    const validNew = newImages.map((u) => u.trim()).filter(Boolean);
+    for (const url of validNew) {
+      await api.post("/images", { url, postId: Number(postId) });
+    }
+
+    for (const tag of tags) {
+      await api.post(`/posts/${postId}/addTag/${tag.id}`).catch(() => {});
+    }
+
+    navigate(mode === "create" ? "/" : `/post/${postId}`);
+  } catch {
+    setError("Error al guardar la publicación");
+  } finally {
+    setSaving(false);
+  }
+};
+
+
 
   if (loading) return <p className="p-4">Cargando...</p>;
   if (error) return <p className="p-4 text-red-600">{error}</p>;
 
   return (
-    <div className="pt-12 max-w-md mx-auto p-4">
+    <div className="mt-24 max-w-md mx-auto p-6 bg-white rounded-xl shadow-md">
       <h2 className="text-xl font-semibold mb-4 text-blue-700">
         {mode === "create"
           ? "Crear publicación"
@@ -212,23 +232,31 @@ export default function PostForm({ mode }: PostFormProps) {
           </div>
 
           {mode !== "view" && (
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Agregar nueva etiqueta..."
-                value={customTag}
-                onChange={(e) => setCustomTag(e.target.value)}
-                className="border border-gray-300 rounded-lg p-2 flex-1"
-              />
-              <button
-                type="button"
-                onClick={handleAddCustomTag}
-                className="bg-blue-600 text-white px-3 py-1 rounded-lg"
-              >
-                Agregar
-              </button>
-            </div>
-          )}
+  <>
+    <div className="flex gap-2">
+      <input
+        type="text"
+        placeholder="Agregar nueva etiqueta..."
+        value={customTag}
+        onChange={(e) => setCustomTag(e.target.value)}
+        className="border border-gray-300 rounded-lg p-2 flex-1"
+      />
+      <button
+        type="button"
+        onClick={handleAddCustomTag}
+        className="bg-blue-600 text-white px-3 py-1 rounded-lg"
+      >
+        Agregar
+      </button>
+    </div>
+
+    {/* 🛑 Mensaje de error si la etiqueta ya existe */}
+    {duplicateTagError && (
+      <p className="text-red-600 text-sm mt-1">{duplicateTagError}</p>
+    )}
+  </>
+)}
+
         </div>
 
         {/* Guardar */}

@@ -85,8 +85,12 @@ export default function PostDetail() {
       showCancelButton: true,
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
-      confirmButtonColor: "#d33",    // rojo para eliminar
-      cancelButtonColor: "#3085d6", // azul para cancelar — se ven bien separados
+      confirmButtonColor: "#d33",    
+      cancelButtonColor: "#3085d6",
+      customClass: {
+      confirmButton: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700",
+      cancelButton: "bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700",
+    }, 
       reverseButtons: false,
     });
 
