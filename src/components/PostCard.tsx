@@ -124,8 +124,16 @@ export default function PostCard({
         {/* 🔹 Contadores + Ver más */}
         <div className="flex justify-between items-center text-xs text-gray-600 border-t pt-3 mt-3">
           <div>
-            💬 {commentCount} comentarios • 🖼️ {imagesCount} imágenes
+            <button
+              onClick={() => navigate(`/post/${post.id}#comments`)}
+              className="hover:text-blue-600 transition-colors"
+            >
+              💬 {commentCount} comentarios
+            </button>
+            {" • "}
+            🖼️ {imagesCount} imágenes
           </div>
+
           <Link
             to={`/post/${post.id}`}
             className="text-blue-600 hover:underline"

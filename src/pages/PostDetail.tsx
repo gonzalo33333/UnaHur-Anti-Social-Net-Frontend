@@ -12,6 +12,7 @@ export default function PostDetail() {
   const { id } = useParams<{ id: string }>();
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [scrolled, setScrolled] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,18 @@ export default function PostDetail() {
       }
     })();
   }, [id]);
+
+useEffect(() => {
+  if (!loading && !scrolled && window.location.hash === "#comments") {
+    const commentsSection = document.getElementById("comments");
+    if (commentsSection) {
+      setTimeout(() => {
+        commentsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        setScrolled(true);
+      }, 150);
+    }
+  }
+}, [loading, scrolled]);
 
   const submitComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,7 +157,7 @@ export default function PostDetail() {
         {/* Descripción */}
         <p className="whitespace-pre-wrap text-gray-800">{post.description}</p>
 
-        {/* Etiquetas (usamos post.tags que devuelve tu backend) */}
+        {/* Etiquetas (usamos post.tags que devuelve el backend) */}
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {post.tags.map((tag: Tag) => (
@@ -176,7 +189,7 @@ export default function PostDetail() {
           </div>
         )}
 
-        <div>
+        <div id="comments">
           <h3 className="font-medium text-lg mb-3 text-gray-700">Comentarios</h3>
           <CommentList comments={comments} />
         </div>

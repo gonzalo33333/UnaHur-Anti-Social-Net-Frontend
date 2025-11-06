@@ -22,6 +22,7 @@ export default function PostForm({ mode }: PostFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(mode !== "create");
   const [saving, setSaving] = useState(false);
+  const MAX_IMAGES = 5;
 
   const [duplicateTagError, setDuplicateTagError] = useState("");
 
@@ -56,7 +57,16 @@ export default function PostForm({ mode }: PostFormProps) {
     }
   };
 
-  const handleAddImageField = () => setNewImages((prev) => [...prev, ""]);
+  const handleAddImageField = () => {
+    const totalImages = existingImages.length + newImages.length;
+
+    if (totalImages >= MAX_IMAGES) {
+      alert(`Solo se permiten un máximo de ${MAX_IMAGES} imágenes por publicación.`);
+      return;
+    }
+
+    setNewImages((prev) => [...prev, ""]);
+  };
   const handleChangeNewImage = (i: number, value: string) => {
     setNewImages((prev) => {
       const next = [...prev];
@@ -66,7 +76,7 @@ export default function PostForm({ mode }: PostFormProps) {
   };
 
   const handleAddCustomTag = async () => {
-  const name = customTag.trim();
+ const name = customTag.replace(/#/g, "").replace(/\s+/g, "").trim(); //se normaliza eliminando espacios y posibles etiquetas duplicadas
   if (!name) return;
 
   // 🔹 Validación de duplicado
@@ -198,13 +208,15 @@ export default function PostForm({ mode }: PostFormProps) {
                 className="w-full border rounded p-2 mb-1"
               />
             ))}
-            <button
-              type="button"
-              onClick={handleAddImageField}
-              className="text-blue-600 text-sm underline"
-            >
-              + Agregar otra imagen
-            </button>
+            {existingImages.length + newImages.length < MAX_IMAGES && (
+              <button
+                type="button"
+                onClick={handleAddImageField}
+                className="text-blue-600 hover:underline"
+              >
+                + Agregar imagen
+              </button>
+            )}
           </div>
         )}
 
